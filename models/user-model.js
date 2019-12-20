@@ -21,14 +21,14 @@ function add(user) {
 
 function getUserByUsername(username) {
   return db("users")
-    .select("id", "username")
+    .select("*")
     .where({ username })
     .first();
 }
 
 function findById(id) {
   return db("users")
-    .select("*")
+    .select("id", "username")
     .where({ id })
     .first();
 }
