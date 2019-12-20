@@ -2,7 +2,8 @@ const db = require("../database/dbConfig");
 module.exports = {
   find,
   findById,
-  add
+  add,
+  getUserByUsername
 };
 
 function find() {
@@ -16,6 +17,13 @@ function add(user) {
       const [id] = ids;
       return findById(id);
     });
+}
+
+function getUserByUsername(username) {
+  return db("users")
+    .select("id", "username")
+    .where({ username })
+    .first();
 }
 
 function findById(id) {

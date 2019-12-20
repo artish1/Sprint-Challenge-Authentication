@@ -26,6 +26,41 @@ router.post("/register", (req, res) => {
 
 router.post("/login", (req, res) => {
   // implement login
+  const body = req.body;
+  if (!body.username || !body.password) {
+    res
+      .status(400)
+      .json({ message: "username and password fields are required" });
+  } else {
+    Users.getUserByUsername(body.username)
+      .then(dbUser => {
+        if (dbUser && bcrypt.compareSync(body.password, dbUser.password)) {
+          const token = generateToken(dbUser);
+          res
+            .status(200)
+            .json({ message: "Welcome, here's your token", token });
+        } else {
+          res.status(401).json({ message: "You shall not pass!" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          message: "There was an error in the server getting user by username"
+        });
+      });
+  }
 });
+
+function generateToken(user) {
+  const payload = {
+    subject: user.id,
+    username: user.username
+  };
+  const options = {
+    expiresIn: "5h"
+  };
+  return jwt.sign(payload, "my fancy shmancy secret", options);
+}
 
 module.exports = router;
